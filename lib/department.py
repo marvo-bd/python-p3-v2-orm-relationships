@@ -1,10 +1,9 @@
 # lib/department.py
 
 from __init__ import CURSOR, CONN
-
+from employee import Employee  # Import Employee class to use in method
 
 class Department:
-
     # Dictionary of objects saved to the database.
     all = {}
 
@@ -134,8 +133,19 @@ class Department:
         sql = """
             SELECT *
             FROM departments
-            WHERE name is ?
+            WHERE name = ?
         """
 
         row = CURSOR.execute(sql, (name,)).fetchone()
         return cls.instance_from_db(row) if row else None
+
+    def employees(self):
+        """Return a list of Employee instances that belong to this department"""
+        sql = """
+            SELECT *
+            FROM employees
+            WHERE department_id = ?
+        """
+
+        rows = CURSOR.execute(sql, (self.id,)).fetchall()
+        return [Employee.instance_from_db(row) for row in rows]
